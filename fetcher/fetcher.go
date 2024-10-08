@@ -15,11 +15,6 @@ type Fetcher struct {
 	ytaService *youtubeanalytics.Service
 }
 
-// func Init() *Fetcher {
-// 	return &Fetcher{
-// 	}
-// }
-
 func (f *Fetcher) InitYTAnalytics(config *oauth2.Config, token *oauth2.Token) error {
 
 	ctx := context.Background()
@@ -37,13 +32,13 @@ func (f *Fetcher) InitYTAnalytics(config *oauth2.Config, token *oauth2.Token) er
 
 func (f *Fetcher) GetVideoStats(videoID string, metrics []string) {
 
-	startDate := "2000-08-01"
-	endDate := "2023-09-01"
+	startDate := "2000-09-01"
+	endDate := "2024-10-01"
 
 	metricsString := strings.Join(metrics, ",")
 
 	call := f.ytaService.Reports.Query().
-		Ids("channel==MINE").
+		Ids("channel==CineNanarFilmsComplets").
 		StartDate(startDate).
 		EndDate(endDate).
 		Filters("video==" + videoID).

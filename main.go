@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 
 	"github.com/gil-x/goyoutubestats/fetcher"
@@ -30,33 +31,33 @@ func case2() {
 	} else {
 		fmt.Println("Token outdated")
 		tokenManager.RefreshToken()
-		fmt.Println("Still up 2")
-		var fetcher fetcher.Fetcher
-		fetcher.InitYTAnalytics(tokenManager.GetConfig(), tokenManager.GetToken())
-		fetcher.GetVideoStats("PQdJCKUpXS8", []string{
-			"views",
-			"likes",
-			"dislikes",
-			"comments",
-			"shares",
-			"estimatedMinutesWatched",
-			"averageViewDuration",
-			// "estimatedRevenue", Marche pas, peut être parce que j'ai rien de monétisé.
-		})
 	}
+	var fetcher fetcher.Fetcher
+	fetcher.InitYTAnalytics(tokenManager.GetConfig(), tokenManager.GetToken())
 }
 
 // CASE 3: I got a client_secret.json from google but no token file
 func case3() {
 	var tokenManager googleauth.TokenManager
 	tokenManager.Init()
-	tokenManager.SetConfigFromSecret("client_secret.json", "https://www.googleapis.com/auth/youtube")
+	tokenManager.SetConfigFromSecret("client_secret.json", "https://www.googleapis.com/auth/youtube.readonly", "https://www.googleapis.com/auth/yt-analytics.readonly", "https://www.googleapis.com/auth/yt-analytics-monetary.readonly", "https://www.googleapis.com/auth/youtubepartner.readonly")
 	tokenManager.AskToken()
 }
 
 // Need to use an authorization code in order to get a token
+// Need to compile in order to use flags
 func main() {
-	// case1()
-	case2()
-	// case3()
+
+	useCase := flag.Int("case", 1, "Use case (1, 2, 3)")
+	flag.Parse()
+	fmt.Printf("Use case: %d\n", *useCase)
+
+	switch *useCase {
+	case 1:
+		case1()
+	case 2:
+		case2()
+	case 3:
+		case3()
+	}
 }

@@ -81,14 +81,16 @@ func (t *TokenManager) saveToken(path string) {
 	json.NewEncoder(f).Encode(t.token)
 }
 
-func (t *TokenManager) SetConfigFromSecret(secret, scope string) {
+func (t *TokenManager) SetConfigFromSecret(secret string, scope ...string) {
 
 	b, err := os.ReadFile(secret)
 	if err != nil {
 		log.Fatalf("Error during reading file %s: %v", secret, err)
 	}
 
-	config, err := google.ConfigFromJSON(b, scope)
+	// config, err := google.ConfigFromJSON(b, scope)
+	config, err := google.ConfigFromJSON(b, scope...)
+
 	if err != nil {
 		log.Fatalf("Erreur during OAuth2 configuration: %v", err)
 	}
