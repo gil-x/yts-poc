@@ -3,61 +3,57 @@ package main
 import (
 	"flag"
 	"fmt"
+	"log"
+	"os"
 
 	"github.com/gil-x/goyoutubestats/fetcher"
 	"github.com/gil-x/goyoutubestats/googleauth"
 )
 
-// CASE 1: I got an valid token from google
-func case1() {
-	var tokenManager googleauth.TokenManager
-	tokenManager.Init()
-	tokenManager.SetTokenFromFile("token.json")
-	if tokenManager.IsTokenValid() {
-		fmt.Println("Token valid, no need to ask")
-	} else {
-		fmt.Println("Token not valid, try Case 2")
-	}
+// Pour definir la liste des scopes
+var scope = [...]string{
+	"https://www.googleapis.com/auth/youtube.readonly",
+	"https://www.googleapis.com/auth/yt-analytics.readonly",
+	"https://www.googleapis.com/auth/yt-analytics-monetary.readonly",
+	"https://www.googleapis.com/auth/youtubepartner.readonly",
 }
 
-// CASE 2: I got an outdated token from google
-func case2() {
-	var tokenManager googleauth.TokenManager
-	tokenManager.Init()
-	tokenManager.SetConfigFromSecret("client_secret.json", "https://www.googleapis.com/auth/youtube")
-	tokenManager.SetTokenFromFile("token.json")
-	if tokenManager.IsTokenValid() {
-		fmt.Println("Token valid, no need to ask")
-	} else {
-		fmt.Println("Token outdated")
-		tokenManager.RefreshToken()
-	}
-	var fetcher fetcher.Fetcher
-	fetcher.InitYTAnalytics(tokenManager.GetConfig(), tokenManager.GetToken())
-}
-
-// CASE 3: I got a client_secret.json from google but no token file
-func case3() {
-	var tokenManager googleauth.TokenManager
-	tokenManager.Init()
-	tokenManager.SetConfigFromSecret("client_secret.json", "https://www.googleapis.com/auth/youtube.readonly", "https://www.googleapis.com/auth/yt-analytics.readonly", "https://www.googleapis.com/auth/yt-analytics-monetary.readonly", "https://www.googleapis.com/auth/youtubepartner.readonly")
-	tokenManager.AskToken()
-}
+// Pour les fichiers a utiliser
+var (
+	token  string
+	client string
+)
 
 // Need to use an authorization code in order to get a token
 // Need to compile in order to use flags
 func main() {
 
-	useCase := flag.Int("case", 1, "Use case (1, 2, 3)")
+	flag.StringVar(&token, "tok", "./token.json", "give the json token path")
+	flag.StringVar(&client, "cli", "./client_secret.json", "give the json client path")
 	flag.Parse()
-	fmt.Printf("Use case: %d\n", *useCase)
 
-	switch *useCase {
-	case 1:
-		case1()
-	case 2:
-		case2()
-	case 3:
-		case3()
+	fmt.Printf("Request with\n - Token: %s\n - Client: %s\n - Scopes: %v", token, client, scope)
+
+	var tokenManager googleauth.TokenManager
+	tokenManager.Init(token)
+
+	tokenManager.SetConfigFromSecret(client, "https://www.googleapis.com/auth/youtube")
+	tokenManager.SetTokenFromFile(token)
+
+	if _, err := os.Stat("token"); err != nil && !os.IsNotExist(err) {
+		tokenManager.AskToken(token)
+	}
+
+	if !tokenManager.IsTokenValid() {
+		fmt.Println("Token outdated")
+		if err := tokenManager.RefreshToken(token); err != nil {
+			log.Fatalln(err)
+		}
+	}
+
+	var fetcher fetcher.Fetcher
+	err := fetcher.InitYTAnalytics(tokenManager.GetConfig(), tokenManager.GetToken())
+	if err != nil {
+		log.Fatalln(err)
 	}
 }

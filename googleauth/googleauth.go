@@ -19,8 +19,8 @@ type TokenManager struct {
 }
 
 // NewTokenManager create a new token manager
-func (t *TokenManager) Init() *TokenManager {
-	token, err := t.loadToken("token.json")
+func (t *TokenManager) Init(tokenPath string) *TokenManager {
+	token, err := t.loadToken(tokenPath)
 	if err != nil {
 		fmt.Printf("No token or corrupted file: %v", err)
 	}
@@ -32,7 +32,7 @@ func (t *TokenManager) Init() *TokenManager {
 	}
 }
 
-func (t *TokenManager) AskToken() {
+func (t *TokenManager) AskToken(tokenPath string) {
 
 	ctx := context.Background()
 
@@ -50,7 +50,7 @@ func (t *TokenManager) AskToken() {
 	}
 
 	t.token = newToken
-	t.saveToken("token.json")
+	t.saveToken(tokenPath)
 }
 
 // LoadToken load token from file
@@ -140,7 +140,7 @@ func (t *TokenManager) IsTokenValid() bool {
 	return t.token.Valid()
 }
 
-func (t *TokenManager) RefreshToken() error {
+func (t *TokenManager) RefreshToken(tokenPath string) error {
 	fmt.Println("Still up 3")
 	if !t.IsTokenValid() {
 		ctx := context.Background()
@@ -150,7 +150,7 @@ func (t *TokenManager) RefreshToken() error {
 		}
 
 		t.token = newToken
-		t.saveToken("token.json")
+		t.saveToken(tokenPath)
 
 		log.Println("Token refresh and saved successfully.")
 	} else {
