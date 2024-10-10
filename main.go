@@ -23,12 +23,15 @@ var (
 	client string
 )
 
+var videoID string
+
 // Need to use an authorization code in order to get a token
 // Need to compile in order to use flags
 func main() {
 
 	flag.StringVar(&token, "tok", "./token.json", "give the json token path")
 	flag.StringVar(&client, "cli", "./client_secret.json", "give the json client path")
+	flag.StringVar(&videoID, "vid", "4FzLOjY2GI0", "give a video id")
 	flag.Parse()
 
 	fmt.Printf("Request with\n - Token: %s\n - Client: %s\n - Scopes: %v\n", token, client, scope)
@@ -59,7 +62,7 @@ func main() {
 		log.Fatalln(err)
 	}
 
-	fetcher.GetVideoStats("PQdJCKUpXS8", []string{
+	fetcher.GetVideoStats(videoID, []string{
 		"views",
 		// "likes",
 		// "dislikes",

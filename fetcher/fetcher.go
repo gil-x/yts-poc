@@ -38,7 +38,7 @@ func (f *Fetcher) GetVideoStats(videoID string, metrics []string) {
 	metricsString := strings.Join(metrics, ",")
 
 	call := f.ytaService.Reports.Query().
-		Ids("channel==CineNanarFilmsComplets").
+		Ids("channel==MINE").
 		StartDate(startDate).
 		EndDate(endDate).
 		Filters("video==" + videoID).
