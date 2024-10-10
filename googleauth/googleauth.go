@@ -22,7 +22,7 @@ type TokenManager struct {
 func (t *TokenManager) Init(tokenPath string) *TokenManager {
 	token, err := t.loadToken(tokenPath)
 	if err != nil {
-		fmt.Printf("No token or corrupted file: %v", err)
+		fmt.Printf("No token or corrupted file: %v\n", err)
 	}
 
 	return &TokenManager{
@@ -41,12 +41,12 @@ func (t *TokenManager) AskToken(tokenPath string) {
 
 	var authCode string
 	if _, err := fmt.Scan(&authCode); err != nil {
-		log.Fatalf("Error when reading authorization code: %v", err)
+		log.Fatalf("Error when reading authorization code: %v\n", err)
 	}
 
 	newToken, err := t.config.Exchange(ctx, authCode)
 	if err != nil {
-		log.Fatalf("Erreur lors de l'échange du token OAuth: %v", err)
+		log.Fatalf("Erreur lors de l'échange du token OAuth: %v\n", err)
 	}
 
 	t.token = newToken
@@ -75,7 +75,7 @@ func (t *TokenManager) saveToken(path string) {
 	fmt.Printf("Enregistrement du token dans %s\n", path)
 	f, err := os.Create(path)
 	if err != nil {
-		log.Fatalf("Impossible de créer le fichier de token: %v", err)
+		log.Fatalf("Impossible de créer le fichier de token: %v\n", err)
 	}
 	defer f.Close()
 	json.NewEncoder(f).Encode(t.token)
@@ -85,14 +85,14 @@ func (t *TokenManager) SetConfigFromSecret(secret string, scope ...string) {
 
 	b, err := os.ReadFile(secret)
 	if err != nil {
-		log.Fatalf("Error during reading file %s: %v", secret, err)
+		log.Fatalf("Error during reading file %s: %v\n", secret, err)
 	}
 
 	// config, err := google.ConfigFromJSON(b, scope)
 	config, err := google.ConfigFromJSON(b, scope...)
 
 	if err != nil {
-		log.Fatalf("Erreur during OAuth2 configuration: %v", err)
+		log.Fatalf("Erreur during OAuth2 configuration: %v\n", err)
 	}
 
 	t.config = config
@@ -101,13 +101,13 @@ func (t *TokenManager) SetConfigFromSecret(secret string, scope ...string) {
 func (t *TokenManager) SetTokenFromFile(tokenPath string) {
 	f, err := os.Open(tokenPath)
 	if err != nil {
-		log.Fatalf("erreur lors du chargement du token : %v", err)
+		log.Fatalf("erreur lors du chargement du token : %v\n", err)
 	}
 	defer f.Close()
 	token := &oauth2.Token{}
 	err = json.NewDecoder(f).Decode(token)
 	if err != nil {
-		log.Fatalf("erreur lors du décodage du token : %v", err)
+		log.Fatalf("erreur lors du décodage du token : %v\n", err)
 	}
 	t.token = token
 	fmt.Println("Token successfully loaded")
@@ -117,11 +117,11 @@ func (t *TokenManager) SetTokenFromFile(tokenPath string) {
 func loadConfigFromJSON(tokenFile, scope string) (*oauth2.Config, error) {
 	b, err := os.ReadFile(tokenFile)
 	if err != nil {
-		log.Fatalf("Erreur lors de la lecture du fichier client_secret.json: %v", err)
+		log.Fatalf("Erreur lors de la lecture du fichier client_secret.json: %v\n", err)
 	}
 	config, err := google.ConfigFromJSON(b, scope)
 	if err != nil {
-		log.Fatalf("Erreur lors de la configuration OAuth2: %v", err)
+		log.Fatalf("Erreur lors de la configuration OAuth2: %v\n", err)
 	}
 	return config, nil
 }

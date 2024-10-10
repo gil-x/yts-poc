@@ -15,7 +15,6 @@ var scope = [...]string{
 	"https://www.googleapis.com/auth/youtube.readonly",
 	"https://www.googleapis.com/auth/yt-analytics.readonly",
 	"https://www.googleapis.com/auth/yt-analytics-monetary.readonly",
-	"https://www.googleapis.com/auth/youtubepartner.readonly",
 }
 
 // Pour les fichiers a utiliser
@@ -32,17 +31,20 @@ func main() {
 	flag.StringVar(&client, "cli", "./client_secret.json", "give the json client path")
 	flag.Parse()
 
-	fmt.Printf("Request with\n - Token: %s\n - Client: %s\n - Scopes: %v", token, client, scope)
+	fmt.Printf("Request with\n - Token: %s\n - Client: %s\n - Scopes: %v\n", token, client, scope)
 
 	var tokenManager googleauth.TokenManager
 	tokenManager.Init(token)
 
-	tokenManager.SetConfigFromSecret(client, "https://www.googleapis.com/auth/youtube")
-	tokenManager.SetTokenFromFile(token)
+	tokenManager.SetConfigFromSecret(client, scope[:]...)
 
-	if _, err := os.Stat("token"); err != nil && !os.IsNotExist(err) {
+	if _, err := os.Stat(token); os.IsNotExist(err) {
 		tokenManager.AskToken(token)
+	} else if err != nil {
+		log.Fatalln(err)
 	}
+
+	tokenManager.SetTokenFromFile(token)
 
 	if !tokenManager.IsTokenValid() {
 		fmt.Println("Token outdated")
@@ -56,4 +58,15 @@ func main() {
 	if err != nil {
 		log.Fatalln(err)
 	}
+
+	fetcher.GetVideoStats("PQdJCKUpXS8", []string{
+		"views",
+		// "likes",
+		// "dislikes",
+		// "comments",
+		// "shares",
+		// "estimatedMinutesWatched",
+		// "averageViewDuration",
+		// "estimatedRevenue",
+	})
 }

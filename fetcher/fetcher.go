@@ -22,7 +22,7 @@ func (f *Fetcher) InitYTAnalytics(config *oauth2.Config, token *oauth2.Token) er
 	service, err := youtubeanalytics.NewService(ctx, option.WithTokenSource(config.TokenSource(ctx, token)))
 
 	if err != nil {
-		log.Fatalf("Unable to create YouTube Analytics service: %v", err)
+		log.Fatalf("Unable to create YouTube Analytics service: %v\n", err)
 	}
 
 	f.ytaService = service
@@ -47,7 +47,7 @@ func (f *Fetcher) GetVideoStats(videoID string, metrics []string) {
 
 	response, err := call.Do()
 	if err != nil {
-		log.Fatalf("Erreur lors de la récupération des statistiques: %v", err)
+		log.Fatalf("Erreur lors de la récupération des statistiques: %v\n", err)
 	}
 
 	fmt.Printf("Statistiques pour %s:\n", videoID)

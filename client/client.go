@@ -18,12 +18,12 @@ type Client struct {
 func (c *Client) New(secret, scope string) error {
 	b, err := os.ReadFile(secret)
 	if err != nil {
-		log.Fatalf("Error during reading file %s: %v", secret, err)
+		log.Fatalf("Error during reading file %s: %v\n", secret, err)
 	}
 
 	config, err := google.ConfigFromJSON(b, scope)
 	if err != nil {
-		log.Fatalf("Erreur during OAuth2 configuration: %v", err)
+		log.Fatalf("Erreur during OAuth2 configuration: %v\n", err)
 	}
 
 	c.config = config
