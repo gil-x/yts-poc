@@ -30,7 +30,7 @@ func (f *Fetcher) InitYTAnalytics(config *oauth2.Config, token *oauth2.Token) er
 	return nil
 }
 
-func (f *Fetcher) GetVideoStats(videoID string, metrics []string) {
+func (f *Fetcher) GetVideoStats(channelID, videoID string, metrics []string) {
 
 	startDate := "2000-09-01"
 	endDate := "2024-10-01"
@@ -38,7 +38,7 @@ func (f *Fetcher) GetVideoStats(videoID string, metrics []string) {
 	metricsString := strings.Join(metrics, ",")
 
 	call := f.ytaService.Reports.Query().
-		Ids("channel==MINE").
+		Ids(fmt.Sprintf("channel==%s", channelID)).
 		StartDate(startDate).
 		EndDate(endDate).
 		Filters("video==" + videoID).
